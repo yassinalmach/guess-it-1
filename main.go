@@ -3,34 +3,51 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
+	"math"
 	"os"
 	"strconv"
 )
 
 func main() {
-	numbers := []float64{}
+	numbers := []int{}
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		line := scanner.Text()
-		nbr, err := strconv.ParseFloat(line, 64)
+		nbr, err := strconv.Atoi(scanner.Text())
 		if err != nil {
-			log.Fatalln(err)
-			return
+			fmt.Printf("The input: %v is not a number.\n", scanner.Text())
+			continue
 		}
 		numbers = append(numbers, nbr)
-		avg := calculateAvrege(numbers)
-        fmt.Println(avg)
+		min, max := guessNextNbr(numbers)
+
+		fmt.Println(min, max)
 	}
 
 }
 
-func calculateAvrege(numbers []float64) float64 {
-	var div float64
-	var sum float64
-	for _, v := range numbers {
-		sum += v
-		div++
+func guessNextNbr(numbers []int) (int, int) {
+	var min, max int
+	min = averege(numbers) - stdDev(numbers)
+	max = averege(numbers) + stdDev(numbers)
+	return min, max
+}
+
+func stdDev(numbers []int) int {
+	avg := averege(numbers)
+	var sum int
+	for _, nbr := range numbers {
+		diff := nbr - avg
+		sum += diff * diff
 	}
-	return sum / div
+
+	variance := sum / len(numbers)
+	return int(math.Sqrt(float64(variance)))
+}
+
+func averege(numbers []int) int {
+	var sum int
+	for _, nbr := range numbers {
+		sum += nbr
+	}
+	return sum / len(numbers)
 }
